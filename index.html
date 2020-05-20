@@ -11,7 +11,7 @@
       margin: 0;
     }
   </style>
-  <script src="http://cdnjs.com/libraries/p5.js"></script>
+  <script src="https://cdnjs.com/libraries/p5.js"></script>
   <!-- <script src="../addons/p5.sound.min.js"></script> -->
   <script src="sketch.js"></script>
 </head>
