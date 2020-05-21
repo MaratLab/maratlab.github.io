@@ -162,7 +162,7 @@ class GameLevel {
   }
 
   use() {
-    if (this.helped == false && this.near() == true) {
+    if (this.helped == false && this.near() == true && this.slide_num != 0) {
       // help
       this.helped = true;
       this.slide_helped = this.slide_num;
@@ -184,7 +184,7 @@ class GameLevel {
         this.timetravel();
       }
     }
-    else if (this.helped && this.slide_num == this.slide_helped && this.player.id == this.id_helped[1] && this.near() == true) {
+    else if (this.helped == true && this.slide_num == this.slide_helped && this.player.id == this.id_helped[1] && this.near() == true) {
       // receive help
       this.player.position.y = this.second_floor.position0.y;
       this.player.msg = ': Tnx!';
@@ -203,7 +203,7 @@ class GameLevel {
         }
       });
     }
-    else if (this.slide_num == 0 && this.player.id != 0 && this.player.position.y == this.second_floor.position0.y && this.near() == true) {
+    else if (this.helped == true && this.slide_num == 0 && this.player.id != 0 && this.player.position.y == this.second_floor.position0.y && this.near() == true) {
       // escape through door
       this.player.position.y = this.first_floor.position0.y;
       this.player.position.x = this.width/2;
@@ -214,7 +214,7 @@ class GameLevel {
         obj.drawable = false;
       });
     }
-    else if (this.slide_num < this.slide_helped && this.player.id == this.slide_num && this.near() == true) {
+    else if (this.helped == true && this.slide_num < this.slide_helped && this.player.id == this.slide_num && this.near() == true) {
       // not receive help and look on younger you running away
       this.strangers.forEach(obj => {
         if (this.player.id < this.id_helped[0]) {
@@ -425,7 +425,7 @@ function draw() {
 }
 
 function keyPressed() {
-  if (key == 'e' || key == 'h') {
+  if (key == 'e' || key == 'h' || keyCode == 32 || keyCode == ENTER) {
     GL.player.use();
   }
   if (keyCode === LEFT_ARROW) {
