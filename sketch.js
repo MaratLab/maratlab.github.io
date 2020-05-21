@@ -111,10 +111,20 @@ class GameLevel {
   go_right(){
     this.slide_num += 1;
 
-    // if (this.helped == false && this.slide_num > 2 && random() < 0.3) {
-    //   this.helped = true;
-    //   this.slide_helped = this.slide_num;
-    // }
+    if (this.helped == false && this.slide_num > 3 && (random() < 0.3 || this.slide_num > 5)) {
+      this.helped = true;
+      this.slide_helped = this.slide_num - 1;
+      this.id_helped = [this.strangers[random(int(0, this.slide_num-3))].id, this.strangers[this.slide_num-2].id];
+      console.log(this.id_helped);
+      this.strangers[this.slide_num-2].position.y = this.second_floor.position0.y;
+      this.strangers[this.slide_num-2].msg = ': Thx!';
+      this.strangers.forEach(obj => {
+        if (obj.id < this.slide_num-1) {
+          obj.position.x = this.player.position.x - this.player.position.x/10 - obj.id * this.player.position.x / this.strangers.length ;
+          obj.msg = ': OOO!';
+        }
+      });
+    }
 
     if (this.helped == true && this.time_machine == null) {
       this.time_machine = new Timemachine(new Position(this.width*3/4 + this.width, this.first_floor.position0.y));
@@ -180,10 +190,14 @@ class GameLevel {
       this.player.msg = ': Tnx!';
       this.strangers.forEach(obj => {
         if (obj.id == this.id_helped[0]) {
-          obj.position.x = this.player.position.x;
+          obj.position.x = this.player.position.x - this.player.width;
           obj.msg = ': OOO!';
         }
-        else if (obj.id < this.slide_num) {
+        else if (obj.id < this.id_helped[0]) {
+          obj.position.x = this.slide_helped * this.width + this.width * 2 + this.width / 2;
+          obj.msg = '';
+        }
+        else if (obj.id < this.id_helped[1]) {
           obj.position.x = this.player.position.x - this.player.position.x/10 - obj.id * this.player.position.x / this.strangers.length ;
           obj.msg = ': OOO!';
         }
@@ -196,18 +210,29 @@ class GameLevel {
       this.player.msg = ': Done!';
       this.door.drawable = false;
       this.second_floor.drawable = false;
+      this.strangers.forEach(obj => {
+        obj.drawable = false;
+      });
     }
     else if (this.slide_num < this.slide_helped && this.player.id == this.slide_num && this.near() == true) {
       // not receive help and look on younger you running away
       this.strangers.forEach(obj => {
-        if (obj.id == this.id_helped[1]) {
+        if (this.player.id < this.id_helped[0]) {
+          obj.position.x = this.slide_helped * this.width + this.width * 2 + this.width / 2;
+          obj.msg = '';
+        }
+        else if (obj.id == this.id_helped[1]) {
           obj.position.x = this.width * (this.slide_helped - this.slide_num) + this.width * 3/4 ;
           obj.position.y = this.first_floor.position0.y;
           obj.msg = ': Help!';
         }
+        else if (obj.id >= this.id_helped[0]) {
+            obj.position.x = this.width * (this.slide_helped - this.slide_num) + this.width * 3/4 - (this.width * 3/4)/10 - obj.id * (this.width * 3/4) / this.strangers.length ;
+            obj.msg = '';
+        }
         else {
-          obj.position.x = this.width * (this.slide_helped - this.slide_num) + this.width * 3/4 - (this.width * 3/4)/10 - obj.id * (this.width * 3/4) / this.strangers.length ;
-          obj.msg = '';
+            obj.position.x = this.slide_helped * this.width + this.width * 2 + this.width / 2;
+            obj.msg = '';
         }
       });
     }
@@ -215,6 +240,12 @@ class GameLevel {
       // witness help
       this.strangers[this.slide_num-1].position.y = this.second_floor.position0.y;
       this.strangers[this.slide_num-1].msg = ': Tnx!';
+      this.strangers.forEach(obj => {
+        if (obj.id < this.id_helped[1]) {
+          obj.msg = ': OOO!';
+        }
+      });
+      this.player.msg = ': OOO!';
     }
   }
 
@@ -399,11 +430,11 @@ function keyPressed() {
   }
   if (keyCode === LEFT_ARROW) {
     if (GL.slide_num != 0 || GL.player.position.x > 20) {
-      GL.player.position.x -= 30;
+      GL.player.position.x -= 50;
     }
   } else if (keyCode === RIGHT_ARROW) {
-    if (GL.helped == false || GL.helped == true && !(GL.slide_num == (GL.slide_helped + 1) && GL.player.position.x >= (GL.width - GL.player.width))) {
-      GL.player.position.x += 30;
+    if (GL.helped == false || GL.helped == true && !(GL.slide_num == (GL.slide_helped + 1) && GL.player.position.x >= (GL.width - GL.player.width) || GL.slide_num == GL.slide_helped && GL.player.id == GL.id_helped[0] && GL.strangers[GL.slide_helped-1].position.y != GL.second_floor.position0.y && GL.player.position.x >= (GL.width - GL.player.width))) {
+      GL.player.position.x += 50;
     }
   }
 
