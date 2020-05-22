@@ -137,7 +137,7 @@ class GameLevel {
       this.strangers.push(stranger);
       console.log(this.strangers.length);
     }
-    if (this.player.id > 0) {
+    if (this.player.id >= 0) {
       this.player.msg = "";
     }
     this.door.position.x -= this.width;
@@ -155,6 +155,9 @@ class GameLevel {
     this.player.position.x += this.width;
     if (this.player.id > 0 && this.player.id == this.slide_num) {
       this.player.msg = ": Help!";
+    }
+    else {
+      this.player.msg = "";
     }
     this.strangers.forEach(obj => {
       obj.position.x += this.width;
@@ -176,6 +179,7 @@ class GameLevel {
           obj.msg = ': OOO!';
         }
       });
+      this.player.msg = ": OOO!";
 
     }
     else if (this.slide_num == (this.slide_helped + 1)) {
