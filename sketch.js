@@ -280,15 +280,16 @@ class GameLevel {
   }
 
   near() {
-    if (this.helped == true && this.slide_num == (this.slide_helped + 1) && abs(this.player.position.x - this.time_machine.position.x) < this.time_machine.width/2){
+    if (this.helped == true && this.slide_num == (this.slide_helped + 1) && abs(this.player.position.x - this.time_machine.position.x) < this.time_machine.width/2
+        && abs(this.player.position.y - this.time_machine.position.y < this.time_machine.height/5)){
       return true;
     }
-    else if (this.slide_num == 0 && abs(this.player.position.x - this.door.position.x) < this.door.width / 2) {
+    else if (this.slide_num == 0 && abs(this.player.position.x - this.door.position.x) < this.door.width / 2 && abs(this.player.position.y - this.door.position.y) < this.door.height / 5) {
       return true;
     }
     else {
       for (let obj of this.strangers) {
-        if (abs(obj.position.x - this.player.position.x) < this.width / 5) {
+        if (abs(obj.position.x - this.player.position.x) < this.width / 5 && abs(obj.position.y - this.player.position.y) < this.height / 10) {
           return true;
         }
       }
