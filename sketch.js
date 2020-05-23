@@ -315,6 +315,7 @@ class GameLevel {
     this.progress_direction = -1;
     this.time_tick_support = - (this.sun.time - this.player.id) + 1;
     this.sun.launch_animation(this.sun.time, - (this.sun.time - this.player.id) + 1, 0.5);
+    this.time_machine.launch_animation();
   }
 
   near() {
@@ -390,6 +391,20 @@ class Timemachine {
     this.drawable = true;
     this.images = [img_timemachine];
     this.charged = true;
+    
+    this.animation_in_progress = false;
+    this.animation_start = 0;
+    this.animation_end = 0;
+    this.animation_duration = 1;
+    this.animation_checkpoint = -1;
+    this.wave = 0;
+  }
+
+  launch_animation(duration=0.5) {
+    this.animation_in_progress = true;
+    this.animation_start = 0;
+    this.animation_end = drawing_width*3;
+    this.animation_duration = duration;
   }
 
   draw() {
@@ -400,11 +415,31 @@ class Timemachine {
       rect(this.position.x, this.position.y - this.height/2, this.width, this.height);
       imageMode(CENTER);
       image(this.images[0], this.position.x, this.position.y - this.height/2, this.width, this.height);
+      if (this.wave != 0) {
+        ellipseMode(CENTER);
+        stroke(255);
+        noFill();
+        circle(this.position.x, this.position.y - this.height/2, this.wave);
+      }
       pop();
     }
   }
 
   update() {
+    if (this.animation_in_progress == true) {
+      if (this.animation_checkpoint == -1) {
+        this.animation_checkpoint = millis();
+      }
+      let checkpoint = millis()
+      this.wave = this.animation_start + (this.animation_end - this.animation_start) * (checkpoint - this.animation_checkpoint) / 1000.0 / this.animation_duration;
+      need_redraw = true;
+      if (((checkpoint - this.animation_checkpoint) / 1000.0 / this.animation_duration) >= 1) {
+        // console.log(checkpoint);
+        this.wave = 0;
+        this.animation_in_progress = false;
+        this.animation_checkpoint = -1;
+      }
+    }
   }
 }
 
