@@ -67,6 +67,7 @@ class GameLevel {
     this.id_helped = [0,0];
     this.time_tick_support = 0;
     this.progress_direction = 1;
+    this.animations = [];
 
     // this.timeline = new Timeline(new Position(this.width/2, this.height*1/4));
     // this.add_object(this.timeline);
@@ -137,6 +138,10 @@ class GameLevel {
     }
 
     if (this.helped == false && this.strangers.length < this.slide_num) {
+      this.strangers.forEach(obj => {
+        obj.position.x = -this.width;
+      });
+
       let stranger = new Person(this.strangers.length + 1, new Position(this.width*3/4 + this.width, this.first_floor.position0.y));
       stranger.msg = ': Help!';
       this.add_object(stranger);
