@@ -161,7 +161,7 @@ class GameLevel {
     if (this.progress_direction == 1) {
       this.time_tick_support += 1;
       if (this.sun.time < this.time_tick_support) {
-        this.sun.time += 1;
+        this.sun.launch_animation(this.sun.time, this.sun.time + 1, 0.5);
       }
     }
     else {
@@ -187,7 +187,7 @@ class GameLevel {
     if (this.progress_direction == -1) {
       this.time_tick_support += 1;
       if (this.sun.time < this.time_tick_support) {
-        this.sun.time += 1;
+        this.sun.launch_animation(this.sun.time, this.sun.time + 1, 0.5);
       }
     }
     else {
@@ -314,7 +314,7 @@ class GameLevel {
 
     this.progress_direction = -1;
     this.time_tick_support = - (this.sun.time - this.player.id) + 1;
-    this.sun.time = - (this.sun.time - this.player.id) + 1;
+    this.sun.launch_animation(this.sun.time, - (this.sun.time - this.player.id) + 1, 0.5);
   }
 
   near() {
@@ -449,6 +449,19 @@ class Sun {
     this.drawable = true;
     this.time = 0;
     this.GL = null;
+    
+    this.time_animation_in_progress = false;
+    this.time_animation_start = 0;
+    this.time_animation_end = 0;
+    this.time_animation_duration = 1;
+    this.time_animation_checkpoint = -1;
+  }
+
+  launch_animation(start=0, end=0, duration=0.0) {
+    this.time_animation_in_progress = true;
+    this.time_animation_start = start;
+    this.time_animation_end = end;
+    this.time_animation_duration = duration;
   }
 
   draw() {
@@ -482,6 +495,20 @@ class Sun {
   }
 
   update() {
+    if (this.time_animation_in_progress == true) {
+      if (this.time_animation_checkpoint == -1) {
+        this.time_animation_checkpoint = millis();
+      }
+      let checkpoint = millis()
+      this.time = this.time_animation_start + (this.time_animation_end - this.time_animation_start) * (checkpoint - this.time_animation_checkpoint) / 1000.0 / this.time_animation_duration;
+      need_redraw = true;
+      if (((checkpoint - this.time_animation_checkpoint) / 1000.0 / this.time_animation_duration) >= 1) {
+        // console.log(checkpoint);
+        this.time = this.time_animation_end;
+        this.time_animation_in_progress = false;
+        this.time_animation_checkpoint = -1;
+      }
+    }
   }
 }
 
