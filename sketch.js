@@ -65,9 +65,14 @@ class GameLevel {
     this.helped = false;
     this.slide_helped = 0;
     this.id_helped = [0,0];
+    this.time_tick_support = 0;
+    this.progress_direction = 1;
 
     // this.timeline = new Timeline(new Position(this.width/2, this.height*1/4));
     // this.add_object(this.timeline);
+    this.sun = new Sun(new Position(this.width/2, this.height/2));
+    this.sun.GL = this;
+    this.add_object(this.sun);
     this.first_floor = new Floor(new Position(0, this.height*3/4), new Position(this.width*3, this.height*3/4));
     this.add_object(this.first_floor);
     this.second_floor = new Floor(new Position(0, this.height*3/5), new Position(this.width*3, this.height*3/5));
@@ -136,7 +141,7 @@ class GameLevel {
       stranger.msg = ': Help!';
       this.add_object(stranger);
       this.strangers.push(stranger);
-      console.log(this.strangers.length);
+      // console.log(this.strangers.length);
     }
     if (this.player.id >= 0) {
       this.player.msg = "";
@@ -147,6 +152,16 @@ class GameLevel {
     this.strangers.forEach(obj => {
       obj.position.x -= this.width;
     });
+
+    if (this.progress_direction == 1) {
+      this.time_tick_support += 1;
+      if (this.sun.time < this.time_tick_support) {
+        this.sun.time += 1;
+      }
+    }
+    else {
+      this.time_tick_support -= 1;
+    }
   }
 
   go_left(){
@@ -163,6 +178,16 @@ class GameLevel {
     this.strangers.forEach(obj => {
       obj.position.x += this.width;
     });
+
+    if (this.progress_direction == -1) {
+      this.time_tick_support += 1;
+      if (this.sun.time < this.time_tick_support) {
+        this.sun.time += 1;
+      }
+    }
+    else {
+      this.time_tick_support -= 1;
+    }
   }
 
   use() {
@@ -245,6 +270,8 @@ class GameLevel {
             obj.msg = '';
         }
       });
+
+      this.progress_direction = 1;
     }
     else if (this.helped == true && this.slide_num == this.slide_helped && this.id_helped[1] != this.player.id && 0 < this.strangers[this.slide_num-1].position.x < this.width) {
       // witness help
@@ -258,6 +285,8 @@ class GameLevel {
       this.player.msg = ': OOO!';
       this.time_machine.charged = true;
     }
+
+    console.log("time:" + str(this.sun.time))
   }
 
   timetravel() {
@@ -266,17 +295,21 @@ class GameLevel {
     this.strangers.forEach(obj => {
       if (obj.id == this.player.id) {
         obj.id -= 1;
-        obj.position.x = this.width*1/4 - this.width * (this.slide_helped - obj.id) ;
-        obj.position.y = this.first_floor.position0.y;
-        obj.msg = '';
       }
-      else {
-        obj.position.x = this.player.position.x + this.width;
+      obj.position.x = this.player.position.x + this.width;
+      obj.position.y = this.first_floor.position0.y;
+      obj.msg = '';
+      
+      if (obj.id == 0) {
+        obj.position.x = this.width*1/4 - this.width * (this.slide_helped - this.player.id + 1) ;
         obj.position.y = this.first_floor.position0.y;
-        obj.msg = '';
       }
     });
     this.time_machine.charged = false;
+
+    this.progress_direction = -1;
+    this.time_tick_support = - (this.sun.time - this.player.id) + 1;
+    this.sun.time = - (this.sun.time - this.player.id) + 1;
   }
 
   near() {
@@ -394,6 +427,41 @@ class Timeline {
       this.crosses.forEach(cross => {
         image(this.images[1], this.position.x, this.position.y - this.height/2 + this.height/10, this.width, this.height);
       });
+      pop();
+    }
+  }
+
+  update() {
+  }
+}
+
+class Sun {
+  constructor(position=null, height=30, width=30) {
+    if (position == null) position = new Position(drawing_width/4, drawing_height/4);
+    this.position = position;
+    this.height = height;
+    this.width = width;
+    this.drawable = true;
+    this.time = 0;
+    this.GL = null;
+  }
+
+  draw() {
+    if (this.drawable == true) {
+      push();
+      translate(this.position.x, this.position.y);
+      push();
+      rotate(this.time * PI / 3.0);
+      ellipseMode(CENTER); 
+      fill('orange');
+      circle(-this.GL.width/3*cos(PI/6.0),-this.GL.height/3*sin(PI/6.0),this.width);
+      fill('white');
+      circle( this.GL.width/3*cos(PI/6.0), this.GL.height/3*sin(PI/6.0),this.width);
+      pop();
+      rectMode(CORNERS);
+      fill(220);
+      noStroke();
+      rect(-this.GL.width,0, this.GL.width, this.GL.height);
       pop();
     }
   }
