@@ -127,7 +127,7 @@ class GameLevel {
     }
 
     if (this.helped == true && this.time_machine == null) {
-      this.time_machine = new Timemachine(new Position(this.width*3/4 + this.width, this.first_floor.position0.y));
+      this.time_machine = new Timemachine(new Position(this.width*3/4 + this.width*(this.slide_helped - this.slide_num + 2), this.first_floor.position0.y));
       this.add_object(this.time_machine);
     }
     else if (this.helped == false && this.strangers.length < this.slide_num) {
