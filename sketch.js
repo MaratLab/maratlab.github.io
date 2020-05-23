@@ -124,13 +124,14 @@ class GameLevel {
           obj.msg = ': OOO!';
         }
       });
+      if (this.helped == true && this.time_machine == null) {
+        this.time_machine = new Timemachine(new Position(this.width*3/4 + this.width*(this.slide_helped - this.slide_num + 2), this.first_floor.position0.y));
+        this.add_object(this.time_machine);
+      }
+      this.time_machine.charged = true;
     }
 
-    if (this.helped == true && this.time_machine == null) {
-      this.time_machine = new Timemachine(new Position(this.width*3/4 + this.width*(this.slide_helped - this.slide_num + 2), this.first_floor.position0.y));
-      this.add_object(this.time_machine);
-    }
-    else if (this.helped == false && this.strangers.length < this.slide_num) {
+    if (this.helped == false && this.strangers.length < this.slide_num) {
       let stranger = new Person(this.strangers.length + 1, new Position(this.width*3/4 + this.width, this.first_floor.position0.y));
       stranger.msg = ': Help!';
       this.add_object(stranger);
@@ -180,18 +181,23 @@ class GameLevel {
         }
       });
       this.player.msg = ": OOO!";
+      if (this.helped == true && this.time_machine == null) {
+        this.time_machine = new Timemachine(new Position(this.width*3/4 + this.width*(this.slide_helped - this.slide_num + 1), this.first_floor.position0.y));
+        this.add_object(this.time_machine);
+      }
+      this.time_machine.charged = true;
 
     }
     else if (this.slide_num == (this.slide_helped + 1)) {
       // time travel
-      if (this.near() == true) {
+      if (this.near() == true && this.time_machine.charged == true) {
         this.timetravel();
       }
     }
     else if (this.helped == true && this.slide_num == this.slide_helped && this.player.id == this.id_helped[1] && this.near() == true) {
       // receive help
       this.player.position.y = this.second_floor.position0.y;
-      this.player.msg = ': Tnx!';
+      this.player.msg = ': Thx!';
       this.strangers.forEach(obj => {
         if (obj.id == this.id_helped[0]) {
           obj.position.x = this.player.position.x - this.player.width;
@@ -243,13 +249,14 @@ class GameLevel {
     else if (this.helped == true && this.slide_num == this.slide_helped && this.id_helped[1] != this.player.id && 0 < this.strangers[this.slide_num-1].position.x < this.width) {
       // witness help
       this.strangers[this.slide_num-1].position.y = this.second_floor.position0.y;
-      this.strangers[this.slide_num-1].msg = ': Tnx!';
+      this.strangers[this.slide_num-1].msg = ': Thx!';
       this.strangers.forEach(obj => {
         if (obj.id < this.id_helped[1]) {
           obj.msg = ': OOO!';
         }
       });
       this.player.msg = ': OOO!';
+      this.time_machine.charged = true;
     }
   }
 
@@ -269,6 +276,7 @@ class GameLevel {
         obj.msg = '';
       }
     });
+    this.time_machine.charged = false;
   }
 
   near() {
@@ -342,6 +350,7 @@ class Timemachine {
     this.width = width;
     this.drawable = true;
     this.images = [img_timemachine];
+    this.charged = true;
   }
 
   draw() {
