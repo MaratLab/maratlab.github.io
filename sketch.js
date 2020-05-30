@@ -599,3 +599,24 @@ function keyPressed() {
 
   need_redraw = true;
 }
+
+function touchStarted() {
+  console.log(touches.length + ' touches');
+  if (touches.length == 0) {
+    if (mouseX > drawing_width/4 && mouseX < drawing_width*3/4) {
+      GL.player.use();
+    }
+    else if (mouseX < drawing_width/4) {
+      if (GL.slide_num != 0 || GL.player.position.x > 20) {
+        GL.player.position.x -= 50;
+      }
+    } 
+    else if (mouseX > drawing_width*3/4) {
+      if (GL.helped == false || GL.helped == true && !(GL.slide_num == (GL.slide_helped + 1) && GL.player.position.x >= (GL.width - GL.player.width) || GL.slide_num == GL.slide_helped && GL.player.id == GL.id_helped[0] && GL.strangers[GL.slide_helped-1].position.y != GL.second_floor.position0.y && GL.player.position.x >= (GL.width - GL.player.width))) {
+        GL.player.position.x += 50;
+      }
+    }
+  
+    need_redraw = true;
+  }
+}
